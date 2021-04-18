@@ -1,6 +1,6 @@
 package pl.poznan.put.utils
 
-interface JsonSerializable {
+interface KafkaJsonSerializable {
     fun toJsonString(): String =
         objectMapper.writeValueAsString(this)
 }

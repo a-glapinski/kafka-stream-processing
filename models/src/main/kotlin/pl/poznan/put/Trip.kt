@@ -1,6 +1,6 @@
 package pl.poznan.put
 
-import pl.poznan.put.utils.JsonSerializable
+import pl.poznan.put.utils.KafkaJsonSerializable
 import java.time.LocalDateTime
 
 data class Trip(
@@ -15,4 +15,4 @@ data class Trip(
     val week: Int,
     val temperature: Double,
     val events: String
-) : JsonSerializable
+) : KafkaJsonSerializable
