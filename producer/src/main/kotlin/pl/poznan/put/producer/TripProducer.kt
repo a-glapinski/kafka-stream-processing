@@ -5,7 +5,7 @@ import org.apache.kafka.clients.producer.ProducerRecord
 import org.apache.kafka.common.serialization.StringSerializer
 import pl.poznan.put.producer.PropertiesKeys.INPUT_DIRECTORY
 import pl.poznan.put.producer.PropertiesKeys.KEY_SERIALIZER
-import pl.poznan.put.producer.PropertiesKeys.SLEEP_INTERVAL_IN_SECONDS
+import pl.poznan.put.producer.PropertiesKeys.SLEEP_INTERVAL_IN_MILLISECONDS
 import pl.poznan.put.producer.PropertiesKeys.TOPIC_NAME
 import pl.poznan.put.producer.PropertiesKeys.VALUE_SERIALIZER
 import pl.poznan.put.common.model.Trip
@@ -33,7 +33,7 @@ class TripProducer(
     private val inputDirectory
         get() = File(properties.getProperty(INPUT_DIRECTORY))
     private val sleepInterval
-        get() = properties.getProperty(SLEEP_INTERVAL_IN_SECONDS).toLong()
+        get() = properties.getProperty(SLEEP_INTERVAL_IN_MILLISECONDS).toLong()
 
     fun produce() {
         inputDirectory.walkTopDown()
@@ -68,7 +68,7 @@ class TripProducer(
             .map(Trip::toJsonString)
             .forEach { trip ->
                 val futureRecordMetadata = kafkaProducer.send(ProducerRecord(topicName, trip))
-                TimeUnit.SECONDS.sleep(sleepInterval)
+                TimeUnit.MILLISECONDS.sleep(sleepInterval)
                 println("${futureRecordMetadata.get()} : $trip")
             }
     }

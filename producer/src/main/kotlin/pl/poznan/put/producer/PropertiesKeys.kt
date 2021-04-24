@@ -6,5 +6,5 @@ object PropertiesKeys {
     const val KEY_SERIALIZER = "key.serializer"
     const val VALUE_SERIALIZER = "value.serializer"
     const val INPUT_DIRECTORY = "input.directory"
-    const val SLEEP_INTERVAL_IN_SECONDS = "sleep.intervalInSeconds"
+    const val SLEEP_INTERVAL_IN_MILLISECONDS = "sleep.intervalInMilliseconds"
 }
