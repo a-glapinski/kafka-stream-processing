@@ -7,7 +7,7 @@ import java.time.LocalDateTime
 data class ConsumerTripStationKey(
     val eventDateTime: LocalDateTime,
     val stationName: String
-) : KafkaJsonSerializable {
+) {
     constructor(tripBicycleStation: TripBicycleStation) : this(
         eventDateTime = tripBicycleStation.trip.dateTime,
         stationName = tripBicycleStation.bicycleStation.name

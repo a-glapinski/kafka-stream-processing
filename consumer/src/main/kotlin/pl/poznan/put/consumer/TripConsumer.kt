@@ -11,12 +11,10 @@ import org.apache.kafka.streams.kstream.Consumed
 import org.apache.kafka.streams.kstream.KStream
 import org.apache.kafka.streams.kstream.Materialized
 import org.apache.kafka.streams.kstream.TimeWindows
-import org.apache.kafka.streams.kstream.Windowed
 import org.apache.kafka.streams.state.WindowStore
 import pl.poznan.put.common.model.Trip
 import pl.poznan.put.common.model.TripBicycleStation
 import pl.poznan.put.common.utils.objectMapper
-import pl.poznan.put.common.utils.toLocalDateTime
 import pl.poznan.put.consumer.PropertiesKeys.BICYCLE_STATIONS_FILEPATH
 import pl.poznan.put.consumer.PropertiesKeys.DURATION_IN_MINUTES
 import pl.poznan.put.consumer.PropertiesKeys.INPUT_TOPIC_NAME
@@ -25,9 +23,9 @@ import pl.poznan.put.consumer.model.ConsumerTripStationKey
 import pl.poznan.put.consumer.model.DayStationAggregateKey
 import pl.poznan.put.consumer.model.DayStationAggregateValue
 import pl.poznan.put.consumer.utils.BicycleStationLoader
-import pl.poznan.put.consumer.utils.DayStationAggregateKeySerde
-import pl.poznan.put.consumer.utils.DayStationAggregateValueSerde
-import pl.poznan.put.consumer.utils.TripBicycleStationSerde
+import pl.poznan.put.consumer.utils.serde.DayStationAggregateKeySerde
+import pl.poznan.put.consumer.utils.serde.DayStationAggregateValueSerde
+import pl.poznan.put.consumer.utils.serde.TripBicycleStationSerde
 import pl.poznan.put.consumer.utils.toHumanReadableTimestampString
 import java.time.Duration
 import java.util.*
@@ -69,16 +67,20 @@ class TripConsumer(
                 KeyValue(key, value)
             }
 
-        val kTable = tripStream
+        val etlTable = tripStream
             .groupBy { k, _ -> DayStationAggregateKey(k) }
             .windowedBy(TimeWindows.of(Duration.ofDays(1)).advanceBy(Duration.ofMinutes(10)))
             .aggregate(
                 ::DayStationAggregateValue,
                 { _, value, aggregateValue ->
                     when (value.trip.startStop) {
-                        0 -> aggregateValue.withIncrementedStartCount()
-                        1 -> aggregateValue.withIncrementedStopCount()
-                        else -> aggregateValue
+                        0 -> aggregateValue
+                            .withIncrementedStartCount()
+                            .withNewAverageTemperature(value.trip.temperature)
+                        1 -> aggregateValue
+                            .withIncrementedStopCount()
+                            .withNewAverageTemperature(value.trip.temperature)
+                        else -> aggregateValue.withNewAverageTemperature(value.trip.temperature)
                     }
                 },
                 Materialized.with<DayStationAggregateKey, DayStationAggregateValue, WindowStore<Bytes, ByteArray>>(
@@ -86,7 +88,7 @@ class TripConsumer(
                 ).withCachingDisabled()
             )
 
-        kTable
+        etlTable
             .toStream()
             .foreach { k, v ->
                 println("${k.toHumanReadableTimestampString()} : $v")

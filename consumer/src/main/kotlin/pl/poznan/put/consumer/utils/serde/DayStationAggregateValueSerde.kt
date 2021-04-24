@@ -1,20 +1,20 @@
-package pl.poznan.put.consumer.utils
+package pl.poznan.put.consumer.utils.serde
 
 import com.fasterxml.jackson.module.kotlin.readValue
 import org.apache.kafka.common.serialization.Deserializer
 import org.apache.kafka.common.serialization.Serde
 import org.apache.kafka.common.serialization.Serializer
-import pl.poznan.put.common.model.TripBicycleStation
 import pl.poznan.put.common.utils.objectMapper
+import pl.poznan.put.consumer.model.DayStationAggregateValue
 
-class TripBicycleStationSerde : Serde<TripBicycleStation> {
-    override fun serializer(): Serializer<TripBicycleStation> =
+class DayStationAggregateValueSerde : Serde<DayStationAggregateValue> {
+    override fun serializer(): Serializer<DayStationAggregateValue> =
         Serializer { _, data ->
             objectMapper.writeValueAsBytes(data)
         }
 
-    override fun deserializer(): Deserializer<TripBicycleStation> =
+    override fun deserializer(): Deserializer<DayStationAggregateValue> =
         Deserializer { _, data ->
-            objectMapper.readValue<TripBicycleStation>(data)
+            objectMapper.readValue<DayStationAggregateValue>(data)
         }
 }
