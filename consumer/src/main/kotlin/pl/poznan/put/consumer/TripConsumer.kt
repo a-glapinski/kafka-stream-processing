@@ -1,4 +1,4 @@
-package pl.poznan.put
+package pl.poznan.put.consumer
 
 import com.fasterxml.jackson.module.kotlin.readValue
 import org.apache.kafka.common.serialization.Serdes.StringSerde
@@ -9,14 +9,14 @@ import org.apache.kafka.streams.StreamsConfig
 import org.apache.kafka.streams.kstream.Consumed
 import org.apache.kafka.streams.kstream.KStream
 import org.apache.kafka.streams.state.Stores
-import pl.poznan.put.PropertiesKeys.BICYCLE_STATIONS_FILEPATH
-import pl.poznan.put.PropertiesKeys.DURATION_IN_MINUTES
-import pl.poznan.put.PropertiesKeys.WORKING_STATIONS_RATIO
-import pl.poznan.put.model.ConsumerTripStationKey
-import pl.poznan.put.model.Trip
-import pl.poznan.put.model.TripBicycleStation
-import pl.poznan.put.utils.BicycleStationLoader
-import pl.poznan.put.utils.objectMapper
+import pl.poznan.put.common.model.Trip
+import pl.poznan.put.common.model.TripBicycleStation
+import pl.poznan.put.common.utils.objectMapper
+import pl.poznan.put.consumer.PropertiesKeys.BICYCLE_STATIONS_FILEPATH
+import pl.poznan.put.consumer.PropertiesKeys.DURATION_IN_MINUTES
+import pl.poznan.put.consumer.PropertiesKeys.WORKING_STATIONS_RATIO
+import pl.poznan.put.consumer.model.ConsumerTripStationKey
+import pl.poznan.put.consumer.utils.BicycleStationLoader
 import java.util.*
 
 class TripConsumer(

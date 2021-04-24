@@ -1,7 +1,7 @@
-package pl.poznan.put.model
+package pl.poznan.put.common.model
 
 import com.fasterxml.jackson.annotation.JsonUnwrapped
-import pl.poznan.put.utils.KafkaJsonSerializable
+import pl.poznan.put.common.utils.KafkaJsonSerializable
 
 data class TripBicycleStation(
     @JsonUnwrapped(prefix = "trip")

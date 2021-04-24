@@ -1,9 +1,9 @@
-package pl.poznan.put
+package pl.poznan.put.producer
 
-import pl.poznan.put.PropertiesKeys.BOOTSTRAP_SERVERS
-import pl.poznan.put.PropertiesKeys.INPUT_DIRECTORY
-import pl.poznan.put.PropertiesKeys.SLEEP_INTERVAL_IN_SECONDS
-import pl.poznan.put.PropertiesKeys.TOPIC_NAME
+import pl.poznan.put.producer.PropertiesKeys.BOOTSTRAP_SERVERS
+import pl.poznan.put.producer.PropertiesKeys.INPUT_DIRECTORY
+import pl.poznan.put.producer.PropertiesKeys.SLEEP_INTERVAL_IN_SECONDS
+import pl.poznan.put.producer.PropertiesKeys.TOPIC_NAME
 import java.util.*
 import kotlin.system.exitProcess
 

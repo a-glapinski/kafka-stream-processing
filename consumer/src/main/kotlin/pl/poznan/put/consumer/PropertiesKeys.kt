@@ -1,4 +1,4 @@
-package pl.poznan.put
+package pl.poznan.put.consumer
 
 object PropertiesKeys {
     const val DURATION_IN_MINUTES = "duration.minutes"

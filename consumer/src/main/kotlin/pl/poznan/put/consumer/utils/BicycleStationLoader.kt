@@ -1,6 +1,6 @@
-package pl.poznan.put.utils
+package pl.poznan.put.consumer.utils
 
-import pl.poznan.put.model.BicycleStation
+import pl.poznan.put.common.model.BicycleStation
 import java.io.File
 
 object BicycleStationLoader {

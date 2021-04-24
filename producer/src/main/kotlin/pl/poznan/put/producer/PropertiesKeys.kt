@@ -1,4 +1,4 @@
-package pl.poznan.put
+package pl.poznan.put.producer
 
 object PropertiesKeys {
     const val BOOTSTRAP_SERVERS = "bootstrap.servers"

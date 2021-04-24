@@ -1,4 +1,4 @@
-package pl.poznan.put.utils
+package pl.poznan.put.common.utils
 
 interface KafkaJsonSerializable {
     fun toJsonString(): String =

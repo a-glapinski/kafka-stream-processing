@@ -1,4 +1,4 @@
-package pl.poznan.put.model
+package pl.poznan.put.common.model
 
 data class BicycleStation(
     val id: Int,

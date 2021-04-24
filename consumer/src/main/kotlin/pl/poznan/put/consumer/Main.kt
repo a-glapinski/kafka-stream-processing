@@ -1,10 +1,10 @@
-package pl.poznan.put
+package pl.poznan.put.consumer
 
-import pl.poznan.put.PropertiesKeys.APPLICATION_ID
-import pl.poznan.put.PropertiesKeys.BICYCLE_STATIONS_FILEPATH
-import pl.poznan.put.PropertiesKeys.BOOTSTRAP_SERVERS
-import pl.poznan.put.PropertiesKeys.DURATION_IN_MINUTES
-import pl.poznan.put.PropertiesKeys.WORKING_STATIONS_RATIO
+import pl.poznan.put.consumer.PropertiesKeys.APPLICATION_ID
+import pl.poznan.put.consumer.PropertiesKeys.BICYCLE_STATIONS_FILEPATH
+import pl.poznan.put.consumer.PropertiesKeys.BOOTSTRAP_SERVERS
+import pl.poznan.put.consumer.PropertiesKeys.DURATION_IN_MINUTES
+import pl.poznan.put.consumer.PropertiesKeys.WORKING_STATIONS_RATIO
 import java.util.*
 import kotlin.system.exitProcess
 

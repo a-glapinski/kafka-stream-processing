@@ -1,14 +1,14 @@
-package pl.poznan.put
+package pl.poznan.put.producer
 
 import org.apache.kafka.clients.producer.KafkaProducer
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.apache.kafka.common.serialization.StringSerializer
-import pl.poznan.put.PropertiesKeys.INPUT_DIRECTORY
-import pl.poznan.put.PropertiesKeys.KEY_SERIALIZER
-import pl.poznan.put.PropertiesKeys.SLEEP_INTERVAL_IN_SECONDS
-import pl.poznan.put.PropertiesKeys.TOPIC_NAME
-import pl.poznan.put.PropertiesKeys.VALUE_SERIALIZER
-import pl.poznan.put.model.Trip
+import pl.poznan.put.producer.PropertiesKeys.INPUT_DIRECTORY
+import pl.poznan.put.producer.PropertiesKeys.KEY_SERIALIZER
+import pl.poznan.put.producer.PropertiesKeys.SLEEP_INTERVAL_IN_SECONDS
+import pl.poznan.put.producer.PropertiesKeys.TOPIC_NAME
+import pl.poznan.put.producer.PropertiesKeys.VALUE_SERIALIZER
+import pl.poznan.put.common.model.Trip
 import java.io.File
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
