@@ -14,6 +14,7 @@ import pl.poznan.put.common.model.TripBicycleStation
 import pl.poznan.put.common.utils.objectMapper
 import pl.poznan.put.consumer.PropertiesKeys.BICYCLE_STATIONS_FILEPATH
 import pl.poznan.put.consumer.PropertiesKeys.DURATION_IN_MINUTES
+import pl.poznan.put.consumer.PropertiesKeys.INPUT_TOPIC_NAME
 import pl.poznan.put.consumer.PropertiesKeys.WORKING_STATIONS_RATIO
 import pl.poznan.put.consumer.model.ConsumerTripStationKey
 import pl.poznan.put.consumer.utils.BicycleStationLoader
@@ -30,6 +31,8 @@ class TripConsumer(
         }
     }
 
+    private val inputTopicName: String
+        get() = properties.getProperty(INPUT_TOPIC_NAME)
     private val durationInMinutes: Long
         get() = properties.getProperty(DURATION_IN_MINUTES).toLong()
     private val workingStationsRatio: Double
@@ -43,7 +46,7 @@ class TripConsumer(
         val streamsBuilder = StreamsBuilder()
 
         val tripStream: KStream<ConsumerTripStationKey, TripBicycleStation> = streamsBuilder
-            .stream("trips-topic", Consumed.with(StringSerde(), StringSerde()))
+            .stream(inputTopicName, Consumed.with(StringSerde(), StringSerde()))
             .map { _, v ->
                 val trip = objectMapper.readValue<Trip>(v)
                 val value = bicycleStations
