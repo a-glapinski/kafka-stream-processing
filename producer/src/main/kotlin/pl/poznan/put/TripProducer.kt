@@ -8,6 +8,7 @@ import pl.poznan.put.PropertiesKeys.KEY_SERIALIZER
 import pl.poznan.put.PropertiesKeys.SLEEP_INTERVAL_IN_SECONDS
 import pl.poznan.put.PropertiesKeys.TOPIC_NAME
 import pl.poznan.put.PropertiesKeys.VALUE_SERIALIZER
+import pl.poznan.put.model.Trip
 import java.io.File
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter

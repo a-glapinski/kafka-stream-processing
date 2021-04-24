@@ -9,7 +9,7 @@ import kotlin.system.exitProcess
 
 fun main(args: Array<String>) {
     if (args.isNotEmpty() && args.size != 4) {
-        System.err.println("Usage: <bootstrapServers> <topicName> <inputDirectory> <sleepIntervalInSeconds>")
+        System.err.println("Args: <bootstrapServers> <topicName> <inputDirectory> <sleepIntervalInSeconds>")
         exitProcess(status = 1)
     }
 

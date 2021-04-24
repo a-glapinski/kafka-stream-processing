@@ -1,4 +1,4 @@
-package pl.poznan.put
+package pl.poznan.put.model
 
 import pl.poznan.put.utils.KafkaJsonSerializable
 import java.time.LocalDateTime
