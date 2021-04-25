@@ -10,6 +10,7 @@ import pl.poznan.put.producer.PropertiesKeys.TOPIC_NAME
 import pl.poznan.put.producer.PropertiesKeys.VALUE_SERIALIZER
 import pl.poznan.put.common.model.Trip
 import java.io.File
+import java.io.IOException
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
@@ -37,6 +38,7 @@ class TripProducer(
 
     fun produce() {
         inputDirectory.walkTopDown()
+            .ifEmpty { throw IOException("Directory not exists or is empty.") }
             .sortedBy { it.name }
             .filter { it.isFile }
             .filter { it.name.startsWith("part") && it.name.endsWith(".csv") }
