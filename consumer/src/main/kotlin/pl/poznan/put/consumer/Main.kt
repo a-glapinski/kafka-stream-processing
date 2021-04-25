@@ -5,7 +5,7 @@ import pl.poznan.put.consumer.PropertiesKeys.BICYCLE_STATIONS_FILEPATH
 import pl.poznan.put.consumer.PropertiesKeys.BOOTSTRAP_SERVERS
 import pl.poznan.put.consumer.PropertiesKeys.DURATION_IN_MINUTES
 import pl.poznan.put.consumer.PropertiesKeys.INPUT_TOPIC_NAME
-import pl.poznan.put.consumer.PropertiesKeys.WORKING_STATIONS_RATIO
+import pl.poznan.put.consumer.PropertiesKeys.DOCKS_ANOMALY_RATIO_IN_PERCENTS
 import java.util.*
 import kotlin.system.exitProcess
 
@@ -14,7 +14,7 @@ fun main(args: Array<String>) {
         System.err.println(
             """Args: 
                 |<durationInMinutes> (D)
-                |<minimalWorkingStationsRatio> (P) 
+                |<minimalWorkingDocksRatioInPercents> (P) 
                 |<bootstrapServers> 
                 |<applicationId>
                 |<inputTopicName>
@@ -25,7 +25,7 @@ fun main(args: Array<String>) {
 
     val properties = Properties().apply {
         set(DURATION_IN_MINUTES, args.getOrElse(0) { "60" })
-        set(WORKING_STATIONS_RATIO, args.getOrElse(1) { "50" } )
+        set(DOCKS_ANOMALY_RATIO_IN_PERCENTS, args.getOrElse(1) { "5" } )
         set(BOOTSTRAP_SERVERS, args.getOrElse(2) { "localhost:9092" })
         set(APPLICATION_ID, args.getOrElse(3) { "kafka-stream-processing" })
         set(INPUT_TOPIC_NAME, args.getOrElse(4) { "trips-topic" })

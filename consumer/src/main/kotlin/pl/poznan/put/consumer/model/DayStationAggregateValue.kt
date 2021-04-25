@@ -12,5 +12,7 @@ data class DayStationAggregateValue(
         this.copy(stopCount = this.stopCount + 1L)
 
     fun withNewAverageTemperature(temperature: Double): DayStationAggregateValue =
-        this.copy(averageTemperature = (this.averageTemperature + temperature) / 2.0)
+        this.copy(
+            averageTemperature = ((startCount + stopCount) * averageTemperature + temperature) / (startCount + stopCount + 1)
+        )
 }

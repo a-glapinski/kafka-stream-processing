@@ -24,8 +24,8 @@ class TripProducer(
     }
 
     private val kafkaProducer = KafkaProducer<String, String>(properties.apply {
-        set(KEY_SERIALIZER, StringSerializer::class.java.canonicalName)
-        set(VALUE_SERIALIZER, StringSerializer::class.java.canonicalName)
+        set(KEY_SERIALIZER, StringSerializer::class.java)
+        set(VALUE_SERIALIZER, StringSerializer::class.java)
     })
 
     private val topicName
