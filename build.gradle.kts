@@ -10,6 +10,11 @@ subprojects {
     group = "pl.poznan.put"
     version = "1.0.0"
 
+    configure<JavaPluginConvention> {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+    }
+
     repositories {
         mavenCentral()
     }
