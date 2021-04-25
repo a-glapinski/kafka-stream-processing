@@ -10,6 +10,7 @@ import org.apache.kafka.streams.kstream.Consumed
 import org.apache.kafka.streams.kstream.Grouped
 import org.apache.kafka.streams.kstream.KStream
 import org.apache.kafka.streams.kstream.Materialized
+import org.apache.kafka.streams.kstream.Produced
 import org.apache.kafka.streams.kstream.TimeWindows
 import org.apache.kafka.streams.state.KeyValueStore
 import org.apache.kafka.streams.state.WindowStore
@@ -26,6 +27,7 @@ import pl.poznan.put.consumer.model.DayStationAggregateKey
 import pl.poznan.put.consumer.model.DayStationAggregateValue
 import pl.poznan.put.consumer.model.StationStartStopCountKey
 import pl.poznan.put.consumer.model.StationStartStopCountValue
+import pl.poznan.put.consumer.model.WindowedDayStationAggregateKey
 import pl.poznan.put.consumer.utils.BicycleStationLoader
 import pl.poznan.put.consumer.utils.serde.AnomalyReportKeySerde
 import pl.poznan.put.consumer.utils.serde.AnomalyReportValueSerde
@@ -35,6 +37,7 @@ import pl.poznan.put.consumer.utils.serde.StationStartStopCountKeySerde
 import pl.poznan.put.consumer.utils.serde.StationStartStopCountValueSerde
 import pl.poznan.put.consumer.utils.serde.TripBicycleStationSerde
 import pl.poznan.put.consumer.utils.serde.TripSerde
+import pl.poznan.put.consumer.utils.serde.WindowedDayStationAggregateKeySerde
 import pl.poznan.put.consumer.utils.toHumanReadableTimestampString
 import java.time.Duration
 import java.util.*
@@ -151,7 +154,12 @@ class TripConsumer(
             }
 
         etlTable.toStream()
-            .to("etl-topic")
+            .map { k, v ->
+                KeyValue(WindowedDayStationAggregateKey(k), v)
+            }
+            .to(
+                "etl-topic", Produced.with(WindowedDayStationAggregateKeySerde(), DayStationAggregateValueSerde())
+            )
 
         anomaliesTable.toStream()
             .to("anomaly-topic")
