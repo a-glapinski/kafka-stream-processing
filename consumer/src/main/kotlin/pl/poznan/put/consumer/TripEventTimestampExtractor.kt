@@ -1,10 +1,8 @@
 package pl.poznan.put.consumer
 
-import com.fasterxml.jackson.module.kotlin.readValue
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.apache.kafka.streams.processor.TimestampExtractor
 import pl.poznan.put.common.model.Trip
-import pl.poznan.put.common.utils.objectMapper
 import pl.poznan.put.common.utils.toEpochMilli
 
 class TripEventTimestampExtractor : TimestampExtractor {
@@ -14,12 +12,9 @@ class TripEventTimestampExtractor : TimestampExtractor {
     ): Long {
         var timestamp = -1L
         val value = record.value()
-
-        if (value is String) {
-            val trip = objectMapper.readValue<Trip>(value)
-            timestamp = trip.dateTime.toEpochMilli()
+        if (value is Trip) {
+            timestamp = value.dateTime.toEpochMilli()
         }
-
         return timestamp
     }
 }

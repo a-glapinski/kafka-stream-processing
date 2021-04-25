@@ -1,6 +1,5 @@
 package pl.poznan.put.consumer
 
-import com.fasterxml.jackson.module.kotlin.readValue
 import org.apache.kafka.common.serialization.Serdes.StringSerde
 import org.apache.kafka.common.utils.Bytes
 import org.apache.kafka.streams.KafkaStreams
@@ -8,13 +7,13 @@ import org.apache.kafka.streams.KeyValue
 import org.apache.kafka.streams.StreamsBuilder
 import org.apache.kafka.streams.StreamsConfig
 import org.apache.kafka.streams.kstream.Consumed
+import org.apache.kafka.streams.kstream.Grouped
 import org.apache.kafka.streams.kstream.KStream
 import org.apache.kafka.streams.kstream.Materialized
 import org.apache.kafka.streams.kstream.TimeWindows
 import org.apache.kafka.streams.state.WindowStore
-import pl.poznan.put.common.model.Trip
+import pl.poznan.put.common.model.BicycleStation
 import pl.poznan.put.common.model.TripBicycleStation
-import pl.poznan.put.common.utils.objectMapper
 import pl.poznan.put.consumer.PropertiesKeys.BICYCLE_STATIONS_FILEPATH
 import pl.poznan.put.consumer.PropertiesKeys.DURATION_IN_MINUTES
 import pl.poznan.put.consumer.PropertiesKeys.INPUT_TOPIC_NAME
@@ -26,6 +25,7 @@ import pl.poznan.put.consumer.utils.BicycleStationLoader
 import pl.poznan.put.consumer.utils.serde.DayStationAggregateKeySerde
 import pl.poznan.put.consumer.utils.serde.DayStationAggregateValueSerde
 import pl.poznan.put.consumer.utils.serde.TripBicycleStationSerde
+import pl.poznan.put.consumer.utils.serde.TripSerde
 import pl.poznan.put.consumer.utils.toHumanReadableTimestampString
 import java.time.Duration
 import java.util.*
@@ -35,7 +35,6 @@ class TripConsumer(
 ) {
     init {
         properties.apply {
-            set(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, DayStationAggregateKeySerde::class.java)
             set(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, TripBicycleStationSerde::class.java)
             set(StreamsConfig.DEFAULT_TIMESTAMP_EXTRACTOR_CLASS_CONFIG, TripEventTimestampExtractor::class.java)
         }
@@ -45,8 +44,8 @@ class TripConsumer(
         get() = properties.getProperty(INPUT_TOPIC_NAME)
     private val durationInMinutes: Long
         get() = properties.getProperty(DURATION_IN_MINUTES).toLong()
-    private val workingStationsRatio: Double
-        get() = properties.getProperty(WORKING_STATIONS_RATIO).toDouble()
+    private val workingStationsRatio: Int
+        get() = properties.getProperty(WORKING_STATIONS_RATIO).toInt()
     private val bicycleStationsFilepath: String
         get() = properties.getProperty(BICYCLE_STATIONS_FILEPATH)
 
@@ -55,20 +54,19 @@ class TripConsumer(
     fun consume() {
         val streamsBuilder = StreamsBuilder()
 
-        val tripStream: KStream<ConsumerTripStationKey, TripBicycleStation> = streamsBuilder
-            .stream(inputTopicName, Consumed.with(StringSerde(), StringSerde()))
-            .map { _, v ->
-                val trip = objectMapper.readValue<Trip>(v)
-                val value = bicycleStations
-                    .firstOrNull { it.id == trip.stationId }
-                    ?.let { TripBicycleStation(trip, it) }
-                    ?: error("Station with id = ${trip.stationId} not found.")
+        val tripStationStream: KStream<ConsumerTripStationKey, TripBicycleStation> = streamsBuilder
+            .stream(inputTopicName, Consumed.with(StringSerde(), TripSerde()))
+            .map { _, trip ->
+                val value = TripBicycleStation(trip, getBicycleStation(trip.stationId))
                 val key = ConsumerTripStationKey(value)
                 KeyValue(key, value)
             }
 
-        val etlTable = tripStream
-            .groupBy { k, _ -> DayStationAggregateKey(k) }
+        val etlTable = tripStationStream
+            .groupBy(
+                { k, _ -> DayStationAggregateKey(k) },
+                Grouped.keySerde(DayStationAggregateKeySerde())
+            )
             .windowedBy(TimeWindows.of(Duration.ofDays(1)).advanceBy(Duration.ofMinutes(10)))
             .aggregate(
                 ::DayStationAggregateValue,
@@ -101,4 +99,9 @@ class TripConsumer(
             start()
         }
     }
+
+    private fun getBicycleStation(bicycleStationId: Int): BicycleStation =
+        bicycleStations
+            .firstOrNull { it.id == bicycleStationId }
+            ?: error("Station with id = $bicycleStationId not found.")
 }
