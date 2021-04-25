@@ -10,28 +10,28 @@ import org.apache.kafka.streams.kstream.Consumed
 import org.apache.kafka.streams.kstream.Grouped
 import org.apache.kafka.streams.kstream.KStream
 import org.apache.kafka.streams.kstream.Materialized
-import org.apache.kafka.streams.kstream.Produced
 import org.apache.kafka.streams.kstream.TimeWindows
 import org.apache.kafka.streams.state.KeyValueStore
 import org.apache.kafka.streams.state.WindowStore
 import pl.poznan.put.common.model.BicycleStation
 import pl.poznan.put.common.model.TripBicycleStation
 import pl.poznan.put.consumer.PropertiesKeys.BICYCLE_STATIONS_FILEPATH
+import pl.poznan.put.consumer.PropertiesKeys.DOCKS_ANOMALY_RATIO_IN_PERCENTS
 import pl.poznan.put.consumer.PropertiesKeys.DURATION_IN_MINUTES
 import pl.poznan.put.consumer.PropertiesKeys.INPUT_TOPIC_NAME
-import pl.poznan.put.consumer.PropertiesKeys.DOCKS_ANOMALY_RATIO_IN_PERCENTS
-import pl.poznan.put.consumer.model.AnomalyAggregateKey
-import pl.poznan.put.consumer.model.AnomalyAggregateValue
+import pl.poznan.put.consumer.model.AnomalyReportKey
 import pl.poznan.put.consumer.model.AnomalyReportValue
 import pl.poznan.put.consumer.model.ConsumerTripStationKey
 import pl.poznan.put.consumer.model.DayStationAggregateKey
 import pl.poznan.put.consumer.model.DayStationAggregateValue
+import pl.poznan.put.consumer.model.StationStartStopCountKey
 import pl.poznan.put.consumer.model.StationStartStopCountValue
 import pl.poznan.put.consumer.utils.BicycleStationLoader
-import pl.poznan.put.consumer.utils.serde.AnomalyAggregateKeySerde
+import pl.poznan.put.consumer.utils.serde.AnomalyReportKeySerde
 import pl.poznan.put.consumer.utils.serde.AnomalyReportValueSerde
 import pl.poznan.put.consumer.utils.serde.DayStationAggregateKeySerde
 import pl.poznan.put.consumer.utils.serde.DayStationAggregateValueSerde
+import pl.poznan.put.consumer.utils.serde.StationStartStopCountKeySerde
 import pl.poznan.put.consumer.utils.serde.StationStartStopCountValueSerde
 import pl.poznan.put.consumer.utils.serde.TripBicycleStationSerde
 import pl.poznan.put.consumer.utils.serde.TripSerde
@@ -104,8 +104,8 @@ class TripConsumer(
 
         val stationsStartStopCountTable = tripStationStream
             .groupBy(
-                { k, _ -> AnomalyAggregateKey(k) },
-                Grouped.keySerde(AnomalyAggregateKeySerde())
+                { k, _ -> StationStartStopCountKey(k) },
+                Grouped.keySerde(StationStartStopCountKeySerde())
             )
             .windowedBy(TimeWindows.of(Duration.ofMinutes(durationInMinutes)).advanceBy(Duration.ofMinutes(10)))
             .aggregate(
@@ -123,28 +123,25 @@ class TripConsumer(
                             )
                     }
                 },
-                Materialized.`as`<AnomalyAggregateKey, StationStartStopCountValue, WindowStore<Bytes, ByteArray>>(
+                Materialized.`as`<StationStartStopCountKey, StationStartStopCountValue, WindowStore<Bytes, ByteArray>>(
                     "stations-start-stop-counts-store"
                 )
-                    .withKeySerde(AnomalyAggregateKeySerde()).withValueSerde(StationStartStopCountValueSerde())
+                    .withKeySerde(StationStartStopCountKeySerde()).withValueSerde(StationStartStopCountValueSerde())
                     .withCachingDisabled()
             )
 
         val anomaliesTable = stationsStartStopCountTable.toStream()
-            .mapValues { _, v ->
-                AnomalyAggregateValue(v)
+            .map { k, v ->
+                KeyValue(AnomalyReportKey(k), AnomalyReportValue(v))
             }
             .filter { _, v ->
                 v.anomalyRatio > docksAnomalyRatio
             }
-            .map { k, v ->
-                KeyValue(k.key(), AnomalyReportValue(k.window(), v))
-            }
             .toTable(
-                Materialized.`as`<AnomalyAggregateKey, AnomalyReportValue, KeyValueStore<Bytes, ByteArray>>(
+                Materialized.`as`<AnomalyReportKey, AnomalyReportValue, KeyValueStore<Bytes, ByteArray>>(
                     "anomaly-store"
                 )
-                    .withKeySerde(AnomalyAggregateKeySerde()).withValueSerde(AnomalyReportValueSerde())
+                    .withKeySerde(AnomalyReportKeySerde()).withValueSerde(AnomalyReportValueSerde())
                     .withCachingDisabled()
             )
 

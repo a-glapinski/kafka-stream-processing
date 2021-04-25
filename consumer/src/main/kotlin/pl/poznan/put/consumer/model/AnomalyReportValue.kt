@@ -2,7 +2,7 @@ package pl.poznan.put.consumer.model
 
 import kotlin.math.abs
 
-data class AnomalyAggregateValue(
+data class AnomalyReportValue(
     val stationDocksInService: Long = 0,
     val stoppedButNotStartedTripCount: Long = 0,
     val startedButNotStoppedTripCount: Long = 0,

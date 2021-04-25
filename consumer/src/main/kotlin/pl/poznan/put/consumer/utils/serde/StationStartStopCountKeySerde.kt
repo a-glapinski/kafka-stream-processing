@@ -5,16 +5,16 @@ import org.apache.kafka.common.serialization.Deserializer
 import org.apache.kafka.common.serialization.Serde
 import org.apache.kafka.common.serialization.Serializer
 import pl.poznan.put.common.utils.objectMapper
-import pl.poznan.put.consumer.model.AnomalyAggregateKey
+import pl.poznan.put.consumer.model.StationStartStopCountKey
 
-class AnomalyAggregateKeySerde : Serde<AnomalyAggregateKey> {
-    override fun serializer(): Serializer<AnomalyAggregateKey> =
+class StationStartStopCountKeySerde : Serde<StationStartStopCountKey> {
+    override fun serializer(): Serializer<StationStartStopCountKey> =
         Serializer { _, data ->
             objectMapper.writeValueAsBytes(data)
         }
 
-    override fun deserializer(): Deserializer<AnomalyAggregateKey> =
+    override fun deserializer(): Deserializer<StationStartStopCountKey> =
         Deserializer { _, data ->
-            objectMapper.readValue<AnomalyAggregateKey>(data)
+            objectMapper.readValue<StationStartStopCountKey>(data)
         }
 }
