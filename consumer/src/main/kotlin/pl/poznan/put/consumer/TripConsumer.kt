@@ -11,6 +11,8 @@ import org.apache.kafka.streams.kstream.Grouped
 import org.apache.kafka.streams.kstream.KStream
 import org.apache.kafka.streams.kstream.Materialized
 import org.apache.kafka.streams.kstream.Produced
+import org.apache.kafka.streams.kstream.Suppressed
+import org.apache.kafka.streams.kstream.Suppressed.BufferConfig.unbounded
 import org.apache.kafka.streams.kstream.TimeWindows
 import org.apache.kafka.streams.state.KeyValueStore
 import org.apache.kafka.streams.state.WindowStore
@@ -99,6 +101,7 @@ class TripConsumer(
                     .withKeySerde(DayStationAggregateKeySerde()).withValueSerde(DayStationAggregateValueSerde())
                     .withCachingDisabled()
             )
+            .suppress(Suppressed.untilWindowCloses(unbounded()))
 
         etlTable.toStream()
             .foreach { k, v ->
@@ -132,6 +135,7 @@ class TripConsumer(
                     .withKeySerde(StationStartStopCountKeySerde()).withValueSerde(StationStartStopCountValueSerde())
                     .withCachingDisabled()
             )
+            .suppress(Suppressed.untilWindowCloses(unbounded()))
 
         val anomaliesTable = stationsStartStopCountTable.toStream()
             .map { k, v ->
